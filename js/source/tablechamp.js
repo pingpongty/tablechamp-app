@@ -865,11 +865,11 @@
             rankingToggle('doubles');
         } else { // Singles
             // New singles player points
-            var t1p1PointsNew = t1rp / decay_factor * [decay_factor - 1] + t1p / decay_factor;
-            var t2p1PointsNew = t2rp / decay_factor * [decay_factor - 1] + t2p / decay_factor;
+            var t1p1PointsNew = 0;
+            var t2p1PointsNew = 0;
             // Update last movements
-            var t1p1LastMovement = t1p1PointsNew - t1rp;
-            var t2p1LastMovement = t2p1PointsNew - t2rp;
+            var t1p1LastMovement = 0;
+            var t2p1LastMovement = 0;
             // Updates games won/lost
             var t1p1GamesLost = localData.playersByKey[t1p1Key].singles_lost;
             var t1p1GamesWon = localData.playersByKey[t1p1Key].singles_won;
@@ -877,15 +877,30 @@
             var t2p1GamesWon = localData.playersByKey[t2p1Key].singles_won;
             var t1Won = false;
             var t2Won = false;
+            var scoreDiff = 0;
             if (parseInt(t1s) > parseInt(t2s)) {
+                scoreDiff = 12 - (t2s * (12/3));
+                // New singles player points
+                t1p1PointsNew = t1rp + scoreDiff;
+                t2p1PointsNew = t2rp - scoreDiff;
+
                 t1Won = true;
                 t1p1GamesWon += 1;
                 t2p1GamesLost += 1;
             } else {
+                scoreDiff = 12 - (t1s * (12/3));
+                // New singles player points
+                t1p1PointsNew = t1rp - scoreDiff;
+                t2p1PointsNew = t2rp + scoreDiff;
+
                 t2Won = true;
                 t1p1GamesLost += 1;
                 t2p1GamesWon += 1;
             }
+            // Update last movements
+            t1p1LastMovement = t1p1PointsNew - t1rp;
+            t2p1LastMovement = t2p1PointsNew - t2rp;
+
             // Cache last game
             lastGame.players = {
                 'type' : 'singles',
