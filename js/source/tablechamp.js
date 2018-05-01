@@ -877,21 +877,18 @@
             var t2p1GamesWon = localData.playersByKey[t2p1Key].singles_won;
             var t1Won = false;
             var t2Won = false;
-            var scoreDiff = 0;
             if (parseInt(t1s) > parseInt(t2s)) {
-                scoreDiff = 12 - (t2s * (12/3));
                 // New singles player points
-                t1p1PointsNew = t1rp + scoreDiff;
-                t2p1PointsNew = t2rp - scoreDiff;
+                t1p1PointsNew = t1rp + (t1s - t2s + 1);
+                t2p1PointsNew = t2rp + t2s;
 
                 t1Won = true;
                 t1p1GamesWon += 1;
                 t2p1GamesLost += 1;
             } else {
-                scoreDiff = 12 - (t1s * (12/3));
                 // New singles player points
-                t1p1PointsNew = t1rp - scoreDiff;
-                t2p1PointsNew = t2rp + scoreDiff;
+                t1p1PointsNew = t1rp + t1s;
+                t2p1PointsNew = t2rp + (t2s - t1s + 1);
 
                 t2Won = true;
                 t1p1GamesLost += 1;
@@ -1376,7 +1373,7 @@
                     "name": player,
                     "singles_last_movement": '',
                     "singles_lost": 0,
-                    "singles_points": 100,
+                    "singles_points": 0,
                     "singles_won": 0,
                     "status": true 
                 }).then(function() {
@@ -1442,3 +1439,4 @@
         }
     }
 })(jQuery);
+
