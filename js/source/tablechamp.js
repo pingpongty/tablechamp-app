@@ -591,8 +591,8 @@
         var singlesTopRankings = '';
         for (var i = 0; i < singlesArray.length; i++) {
             if (singlesArray[i].status) {
-                var singlesLastMovement = (singlesArray[i].singles_last_movement) ? singlesArray[i].singles_last_movement.toFixed(2) : '';
-                var singlesPoints = (singlesArray[i].singles_points) ? singlesArray[i].singles_points.toFixed(2) : '';
+                var singlesLastMovement = (singlesArray[i].singles_last_movement) ? parseFloat(singlesArray[i].singles_last_movement).toFixed(2) : '';
+                var singlesPoints = (singlesArray[i].singles_points) ? parseFloat(singlesArray[i].singles_points).toFixed(2) : '';
                 if (i < 3) {
                     singlesTopRankings += tmpl('rankingsRow', {
                         'key': singlesArray[i].key,
@@ -877,27 +877,32 @@
             var t2p1GamesWon = localData.playersByKey[t2p1Key].singles_won;
             var t1Won = false;
             var t2Won = false;
+            var scoreDiff = 0;
             if (parseInt(t1s) > parseInt(t2s)) {
                 // New singles player points
-                t1p1PointsNew = t1rp + (t1s - t2s + 1);
-                t2p1PointsNew = t2rp + t2s;
+                t1p1LastMovement = parseFloat(t1s - t2s + 1);
+                t2p1LastMovement = parseFloat(t2s);
 
                 t1Won = true;
                 t1p1GamesWon += 1;
                 t2p1GamesLost += 1;
             } else {
                 // New singles player points
-                t1p1PointsNew = t1rp + t1s;
-                t2p1PointsNew = t2rp + (t2s - t1s + 1);
+                t1p1LastMovement = parseFloat(t2s - t1s + 1);
+                t2p1LastMovement = parseFloat(t1s);
 
                 t2Won = true;
                 t1p1GamesLost += 1;
                 t2p1GamesWon += 1;
             }
             // Update last movements
-            t1p1LastMovement = t1p1PointsNew - t1rp;
-            t2p1LastMovement = t2p1PointsNew - t2rp;
+            console.log(t1rp);
+            console.log(t2rp);
+            t1p1PointsNew = parseFloat(t1rp + t1p1LastMovement);
+            t2p1PointsNew = parseFloat(t2rp + t2p1LastMovement);
 
+            console.log(t1p1PointsNew);
+            console.log(t2p1PointsNew);
             // Cache last game
             lastGame.players = {
                 'type' : 'singles',
@@ -1439,4 +1444,3 @@
         }
     }
 })(jQuery);
-
