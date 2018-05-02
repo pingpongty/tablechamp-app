@@ -888,8 +888,8 @@
                 t2p1GamesLost += 1;
             } else {
                 // New singles player points
-                t1p1LastMovement = parseFloat(t2s - t1s + 1);
-                t2p1LastMovement = parseFloat(t1s);
+                t2p1LastMovement = parseFloat(t2s - t1s + 1);
+                t1p1LastMovement = parseFloat(t1s);
 
                 t2Won = true;
                 t1p1GamesLost += 1;
