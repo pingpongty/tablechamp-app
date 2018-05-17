@@ -1,15 +1,17 @@
 language: node_js
 node_js:
 - '6.2'
-
 script:
-  - echo "hello"
-  - npm install
+- echo "hello"
+- npm install
+- npm run build
 deploy:
-  skip_cleanup: true
-  provider: script
-  script: ./deploy.sh
+  provider: pages
+  skip-cleanup: true
+  github-token: "$GITHUB_TOKEN"
+  keep-history: true
   on:
-    branch:
-      master
-
+    branch: master
+env:
+  global:
+    secure: XV4OJoFgPgOEf73GdE62kNjyRehweBGMGmDgtdY7YOs+qP3sC5PihlxZcA+Uc6KvpCMTIHbQ7UGtkFkLgrjR2Ll4tpaSA1OGa7WhXMNv7JTJzb1dKR0dXe4m4yhfr1fkI8lQKIzj6ePorOyoucNUe/rqkEK20+4DttV6Jg4gfbprxjP6cuiqCqHBPl04v+xFU49+7HgYqYBPDDBlx6NsC3Dd9e8k1LaNw/j/cZn+zmhL1YNA2cGClOfOvB1w7cHXrtiFdDmo7swZTTkL1IhR5QKHdVqo4ZITt27lMMI3P8Ybri5Xc6uTotTnBVgDaYO5hbwxRMJ6UpJoS7cpw+tq73Q3NCsJqHRCL84yIxuioqn5+jy8aiG1Woc5mHIU8cUVWxh3qkqvmMtcajC/2ccrqsZyCTC72TwDpXnU8lLdabuF7wXb4hfwID935uKBMVHbVyS+h+I0u2hKisxrmpCqrI0t5FsWrMDzkucXIzEbVPC0RzeVNsVfep4ehJpaZUQskJmdjGt3GqugQ8Ok7qEE3UUP1LMFUIARl3WYbmWl4tlsG6jqKaP+V4JzsnyAEYBtc9Nxb+OQvdtz4iA5usxYgzOaZpf1qXSHFntDmM8PhpmCLp3PtHurequc6prLQyEp2IdFm1tTCaO9z6OqjpvuK+PUiZarIEN2Kr0RD18Yrs0=
