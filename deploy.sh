@@ -1,5 +1,5 @@
 #!/bin/bash
-FULL_REPO="git@github.com:Unicity/jade.git"
+FULL_REPO="git@github.com:powerc9000/tablechamp-app"
 
 
 # setup REPO and checkout gh-pages branch
