@@ -4,6 +4,7 @@ import firebaseData from "./firebase-key";
 import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
+import moment from "moment";
 
 
 class App extends Component {
@@ -66,14 +67,43 @@ class App extends Component {
     db.ref("/v2/games").push(game);
     this.toggleAddScore();
   }
+  renderRecents(){
+    const {games, users} = this.state.firebaseData;
+    const inner = Object.entries(games).sort((a, b)=>{
+      if(a[1].date > b[1].date){
+        return -1;
+      } else if(a[1].date < b[1].date){
+        return 1;
+      } else {
+        return 0
+      }
+    }).slice(0, 10).map(([id, game])=> {
+      const winner = users[game.winner].username;
+      const loser = users[game.loser].username;
+
+      return (
+        <div key={id}>
+          <div>{winner} beat {loser}</div>
+          <div>{game.score[0]}-{game.score[1]}</div>
+          <hr />
+        </div>
+      )
+    })
+
+    return (
+      <div>
+        {inner}
+      </div>
+    )
+  }
   renderMain(){
     if(this.state.firebaseData){
       const results = extractScoresAndRankUsers(this.state.firebaseData);
       const top3 = results.slice(0,3);
       const rest = results.slice(3);
       return (
-        
-        <div style={{padding:20}}>
+        <div style={{display:"flex"}}>
+          <div style={{flex:1, padding:20}}>
           <div style={{display:"flex"}}>
             <div style={{color:"white"}}>
               <div>Unicity</div>
@@ -100,6 +130,11 @@ class App extends Component {
           })
         }
       </div>
+  </div>
+        </div>
+      <div style={{backgroundColor:"white", padding:20, height:"100vh", flex:.2, flexShrink:0}}>
+        <div style={{fontSize:25, marginBottom:10}}>Recent matches</div>
+        {this.renderRecents()}
       </div>
       <Modal show={this.state.addScoreModal} offClick={this.toggleAddScore}>
         <div style={{backgroundColor:"white", width:"50vw", margin:"auto"}}>
@@ -172,7 +207,53 @@ class Player extends Component {
   state = {
     expandedView: false
   }
+  toggleModal = (e) => {
+    if(e && this.state.expandedView){
+      return;
+    }
+    this.setState({
+      expandedView: !this.state.expandedView
+    })
+  }
+  renderGames(){
+    const games = this.props.player.games;
+    let inner;
+    if(!games.length){
+      inner = "No games played"
+    } else {
+      inner = games.map((game)=>{
+        let playerScore;
+        let opponentScore;
+        let color;
+        const score = game.score;
+        if(game.result === "win"){
+          playerScore = score[0];
+          color = "green";
+          opponentScore = score[1];
+        } else {
+          color = "red";
+          playerScore = score[1];
+          opponentScore = score[0];
+        }
+        return (
+          <div style={{color, fontSize:20, display:"flex"}} key={game.id}>
+            <div>
+              {game.result.toUpperCase()} vs {game.opponent} {playerScore}-{opponentScore} 
+            </div>
+            <div style={{marginLeft:"auto"}}>
+             {moment(game.date).format("MM/DD/YY")}
+            </div>
+          </div>
+        )
+     })
+    }
 
+    return (
+      <div>
+        {inner}
+      </div>
+    )
+  }
   render(){
     const {player} = this.props;
     let topStyles = {};
@@ -182,8 +263,9 @@ class Player extends Component {
         fontSize:30
       }
     } 
+
     return (
-      <div className="player" style={{...topStyles}}>
+      <div className="player" style={{...topStyles}} onClick={this.toggleModal}>
           <div style={{marginRight:10}}>
             {this.props.rank}
           </div>
@@ -203,6 +285,17 @@ class Player extends Component {
             </div>
 
           </div>
+          <Modal show={this.state.expandedView} offClick={this.toggleModal}>
+            <div style={{width:600, margin:"auto", color:"black", backgroundColor:"white", padding:20}}>
+              <div>
+                {player.username}
+              </div>
+              <small style={{fontSize:15}}>
+                Match history
+              </small>
+              {this.renderGames()}
+            </div>
+          </Modal>
       </div>
     )
   }
@@ -415,7 +508,8 @@ function extractScoresAndRankUsers(firebaseData){
         result.games.push({
           result: "win",
           id:game_id,
-          opponent: firebaseData.users[game.winner].username,
+          date: game.date,
+          opponent: firebaseData.users[game.loser].username,
           score: game.score
         })
         result.wins++;
@@ -427,6 +521,7 @@ function extractScoresAndRankUsers(firebaseData){
         result.games.push({
           result: "loss",
           id:game_id,
+          date: game.date,
           opponent: firebaseData.users[game.winner].username,
           score: game.score
         })
