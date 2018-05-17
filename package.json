@@ -2,9 +2,10 @@
   "name": "tablechamp-app",
   "version": "0.1.0",
   "private": true,
-	"homepage": "https://claymurray.website/tablechamp-app",
+  "homepage": "https://claymurray.website/tablechamp-app",
   "dependencies": {
     "firebase": "^5.0.2",
+    "moment": "^2.22.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "react-router": "^4.2.0",
