@@ -19,6 +19,7 @@ git config user.name "Unicity-Github-Bot"
 git config user.email "clay.murray@unicity.com"
 git checkout -B gh-pages
 
+
 # commit and push changes
 git add -f .
 git commit -m "GH-Pages update by travis after $TRAVIS_COMMIT"
