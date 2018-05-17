@@ -1,0 +1,30 @@
+.add-score-button {
+  background-color:transparent;
+  border-color:#57d3c3;
+  border-width:2; 
+  color: #57d3c3; 
+  font-size:15px; 
+  padding:5px 10px;
+
+}
+.add-score-button:hover {
+  background-color:#57d3c3;
+  color: white;
+}
+
+.player {
+  color:white;
+  padding:20px;
+  border: 2px #283350 solid;
+  margin-top:10px;
+  border-radius:5px;
+  margin-bottom:10px;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  cursor:pointer
+}
+.player:hover{
+  border-color: white;
+}
+
