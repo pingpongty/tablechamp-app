@@ -4,6 +4,7 @@ node_js:
 
 script:
   - echo "hello"
+  - npm install
 deploy:
   skip_cleanup: true
   provider: script
