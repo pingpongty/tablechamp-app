@@ -68,7 +68,10 @@ class App extends Component {
     this.toggleAddScore();
   }
   renderRecents(){
-    const {games, users} = this.state.firebaseData;
+    const {games, users, season} = this.state.firebaseData;
+    if(!games){
+      return ""
+    }
     const inner = Object.entries(games).sort((a, b)=>{
       if(a[1].date > b[1].date){
         return -1;
@@ -80,7 +83,9 @@ class App extends Component {
     }).slice(0, 10).map(([id, game])=> {
       const winner = users[game.winner].username;
       const loser = users[game.loser].username;
-
+      if(game.season !== season){
+        return null;
+      }
       return (
         <div key={id}>
           <div>{winner} beat {loser}</div>
@@ -133,7 +138,11 @@ class App extends Component {
   </div>
         </div>
       <div style={{backgroundColor:"white", padding:20, height:"100vh", flex:.2, flexShrink:0}}>
-        <div style={{fontSize:25, marginBottom:10}}>Recent matches</div>
+        <div style={{marginBottom:10}}>
+          <p style={{fontSize:25, marginBottom:5}}>Recent matches</p>
+          <p style={{fontSize:10}}>Season: {this.state.firebaseData.season}</p>
+        </div>
+        
         {this.renderRecents()}
       </div>
       <Modal show={this.state.addScoreModal} offClick={this.toggleAddScore}>
@@ -374,7 +383,7 @@ class AddGame extends Component {
       loser = 1;
     } else {
       winner = 1;
-      loser = 2;
+      loser = 0;
     }
     result.winner = people[winner];
     result.score = [scores[winner], scores[loser]];
