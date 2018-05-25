@@ -62,10 +62,30 @@ class App extends Component {
       addScoreModal: !this.state.addScoreModal
     })
   }
-  addGame = (game) => {
+  addGame = (game, gameId) => {
     const db = firebase.database();
-    db.ref("/v2/games").push(game);
+    if(!gameId){
+      db.ref("/v2/games").push(game);
+    } else {
+      db.ref(`/v2/games/${gameId}`).set(game);
+    }
+    this.setState({
+      gameId: null
+    })
     this.toggleAddScore();
+  }
+  deleteGame = (gameId) => {
+    const yes = window.confirm("Are you sure?");
+    if(yes){
+      const db = firebase.database();
+      db.ref(`/v2/games/${gameId}`).remove();
+    }
+  }
+  requestEditGame = (gameId) => {
+    this.setState({
+      addScoreModal: true,
+      gameId: gameId
+    });
   }
   renderRecents(){
     const {games, users, season} = this.state.firebaseData;
@@ -122,7 +142,7 @@ class App extends Component {
           <div>
             {
               top3.map((user, index)=>{
-                return (<Player player={user} rank={index+1} top3={true} key={user.username}/>)
+                return (<Player player={user} rank={index+1} top3={true} key={user.username} gameEdit={this.requestEditGame} deleteGame={this.deleteGame}/>)
               })
             }
           </div>
@@ -130,7 +150,7 @@ class App extends Component {
         {
           rest.map((user, index)=>{
             return (
-              <Player player={user} rank={index+4} key={user.username}/>
+              <Player player={user} rank={index+4} key={user.username} gameEdit={this.requestEditGame} deleteGame={this.deleteGame}/>
             )
           })
         }
@@ -147,7 +167,7 @@ class App extends Component {
       </div>
       <Modal show={this.state.addScoreModal} offClick={this.toggleAddScore}>
         <div style={{backgroundColor:"white", width:"50vw", margin:"auto"}}>
-          <AddGame data={this.state.firebaseData} onAdd={this.addGame} />
+          <AddGame data={this.state.firebaseData} onAdd={this.addGame} gameId={this.state.gameId}/>
         </div>
       </Modal>
     </div>
@@ -224,6 +244,15 @@ class Player extends Component {
       expandedView: !this.state.expandedView
     })
   }
+  editGame = (gameId) => () => {
+    this.setState({
+      expandedView: false
+    })
+    this.props.gameEdit(gameId);
+  }
+  deleteGame = (gameId) => () => {
+    this.props.deleteGame(gameId);
+  }
   renderGames(){
     const games = this.props.player.games;
     let inner;
@@ -251,7 +280,18 @@ class Player extends Component {
             </div>
             <div style={{marginLeft:"auto"}}>
              {moment(game.date).format("MM/DD/YY")}
-            </div>
+           </div>
+         <div>
+           <button className="btn btn-link" onClick={this.editGame(game.id)}>
+             <i className="fas fa-edit"></i>
+           </button>
+
+       </div>
+     <div>
+       <button className="btn btn-link" onClick={this.deleteGame(game.id)}>
+          <i className="fas fa-trash-alt"></i>
+     </button>
+     </div>
           </div>
         )
      })
@@ -333,11 +373,26 @@ class Modal extends Component {
 }
 
 class AddGame extends Component {
-  state = {
-    player1: "",
-    player2: "",
-    score1: 0,
-    score2: 0
+  constructor(props){
+    super(props);
+    if(!props.gameId){
+      this.state = {
+        player1: "",
+        player2: "",
+        score1: 0,
+        score2: 0
+      }
+    } else {
+      const game = props.data.games[props.gameId];
+      console.log(props);
+      this.state = {
+        player1: game.winner,
+        player2: game.loser,
+        score1: game.score[0],
+        score2: game.score[1],
+        date: game.date
+      }
+    }
   }
   setPlayer = (side, id) => () => {
     if(side === 1){
@@ -388,13 +443,18 @@ class AddGame extends Component {
     result.winner = people[winner];
     result.score = [scores[winner], scores[loser]];
     result.season = this.props.data.season;
-    result.date = Date.now();
+    if(!this.props.gameId){
+      result.date = Date.now();
+    } else {
+      result.date = this.state.date;
+    }
     result.loser = people[loser];
 
-
-    this.props.onAdd(result);
+    const gameId = this.props.gameId;
+    this.props.onAdd(result, gameId);
   }
   renderPlayers(side){
+    if(this.props.gameId) return null;
     const players = Object.entries(this.props.data.users).map(([id, user])=> {
       const {player1, player2} = this.state;
       let disabled = false;
@@ -513,7 +573,6 @@ function extractScoresAndRankUsers(firebaseData){
     Object.entries(games).forEach(([game_id,game])=>{
       if(game.season !== season) return;
       if(game.winner === id){
-      console.log(id, game);
         result.games.push({
           result: "win",
           id:game_id,
